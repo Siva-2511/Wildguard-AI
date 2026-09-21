@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+{% block title %}Report Draft — WildGuard Report AI{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <a href="/analyse-view" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Analysis
+  </a>
+
+  <div class="page-header">
+    <div class="page-header-row">
+      <div>
+        <h1 class="page-title">Monthly HWC Report — Draft</h1>
+        <p class="page-subtitle">Review the AI-generated draft below. All observations must be validated by a qualified field officer before submission.</p>
+      </div>
+      <span class="chip {% if report.is_demo %}chip-amber{% else %}chip-green{% endif %}" style="margin-top:8px;">
+        {% if report.is_demo %}
+          ⚠ Demo Mode
+        {% else %}
+          ✓ Live AI · {{ report.model_used }}
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
+  <div class="report-layout">
+
+    <!-- ── Document ── -->
+    <div class="report-main">
+
+      <!-- Reporting Context Panel -->
+      <div class="reporting-context-card">
+        <div class="context-card-header">
+          <div class="context-card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Reporting Context</span>
+          </div>
+          <span class="context-sdg-tag" title="Primary: SDG 15 (Life on Land) | Secondary: SDG 17 (Partnerships for the Goals)">
+            SDG 15 & 17 Standardized Report
+          </span>
+        </div>
+        <form action="/report" method="POST" class="context-form">
+          <div class="context-grid">
+            <div class="form-group">
+              <label class="form-label" for="reporting_team">Reporting team / organisation</label>
+              <input type="text" id="reporting_team" name="reporting_team" class="form-input" placeholder="e.g. Community Wildlife Monitoring Team" value="{{ report.reporting_team or '' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reporting_area">Reporting area</label>
+              <input type="text" id="reporting_area" name="reporting_area" class="form-input" placeholder="e.g. Northern Community Conservancy" value="{{ report.reporting_area or '' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="intended_recipient">Intended recipient / partner</label>
+              <input type="text" id="intended_recipient" name="intended_recipient" class="form-input" placeholder="e.g. Wildlife Authority / Conservation Partner" value="{{ report.intended_recipient or '' }}">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="prepared_by">Prepared by</label>
+              <input type="text" id="prepared_by" name="prepared_by" class="form-input" placeholder="e.g. Field Monitoring Officer" value="{{ report.prepared_by or '' }}">
+            </div>
+          </div>
+          <div class="context-form-actions">
+            <button type="submit" name="action" value="save_context" class="btn btn-secondary btn-sm">
+              Save Context
+            </button>
+            <span class="context-help-text">These optional metadata fields will be included in the standardized header of your exported report to support partner coordination.</span>
+          </div>
+        </form>
+      </div>
+
+      <!-- Meta strip -->
+      <div class="report-meta-strip">
+        <span class="report-meta">Period: <strong>{{ report.period_formatted }}</strong></span>
+        <span class="report-meta-sep">·</span>
+        <span class="report-meta">Records: <strong>{{ report.total_records }}</strong></span>
+        <span class="report-meta-sep">·</span>
+        <span class="report-meta">Generated: <strong>{{ report.generated_at if report.generated_at else 'Just now' }}</strong></span>
+      </div>
+
+      <!-- Paper document -->
+      <div class="doc-paper">
+
+        <!-- AI Notice -->
+        <div class="doc-ai-notice">
+          <div class="doc-ai-notice-title">⚠ AI-Generated Draft — Human Review Required</div>
+          {{ report.notice }}
+        </div>
+
+        <!-- Document title block -->
+        <div class="doc-title-block">
+          <div class="doc-report-title">Monthly Human-Wildlife Conflict Incident Report</div>
+          <div class="doc-report-period">Reporting Period: {{ report.period_formatted }}</div>
+        </div>
+
+        <!-- Document body — clean executive formatting -->
+        <div class="doc-body">
+          {% set ns = namespace(in_list=false) %}
+          {% set sec_icons = {
+            'SECTION 1': '📋',
+            'SECTION 2': '🐾',
+            'SECTION 3': '📍',
+            'SECTION 4': '🕒',
+            'SECTION 5': '⚠️',
+            'SECTION 6': '✅',
+            'SECTION 7': '🔍',
+            'SECTION 8': '💡'
+          } %}
+          {% for line in report.llm_text.split('\n') %}
+            {% set raw_line = line.strip() %}
+            {% set raw_line = raw_line.lstrip('#').strip() %}
+            {% if raw_line and not raw_line.startswith('---') and not raw_line.startswith('===') and 'HUMAN REVIEW REQUIRED' not in raw_line.upper() %}
+              {% set is_heading = 'SECTION' in raw_line.upper() %}
+              {% set is_bullet = raw_line.startswith('-') or raw_line.startswith('•') or (raw_line.startswith('*') and not raw_line.startswith('**')) %}
+              {% set is_num = raw_line[0].isdigit() and raw_line[1:2] in ['.', ')'] %}
+
+              {% if is_heading %}
+                {% if ns.in_list %}
+                  </ul>
+                  {% set ns.in_list = false %}
+                {% endif %}
+                {% set clean_title = raw_line | replace('*', '') %}
+                {% set sec_num = clean_title.split('—')[0].strip() if '—' in clean_title else clean_title.split('-')[0].strip() %}
+                {% set icon = sec_icons.get(sec_num.upper(), '📌') %}
+                <div class="doc-section-head">
+                  <span class="doc-sec-icon">{{ icon }}</span>
+                  <span>{{ clean_title }}</span>
+                </div>
+
+              {% elif is_bullet or is_num %}
+                {% if not ns.in_list %}
+                  <ul class="doc-ul">
+                  {% set ns.in_list = true %}
+                {% endif %}
+                {% set item_txt = raw_line[1:].strip() if not is_num else raw_line[2:].strip() %}
+                {% set formatted_item = item_txt | replace('**', '<BOLDOPEN>') | replace('<BOLDOPEN>', '<strong>', 1) %}
+                {% set formatted_item = formatted_item | replace('<BOLDOPEN>', '</strong>') | replace('*', '') %}
+                <li>{{ formatted_item | safe }}</li>
+
+              {% else %}
+                {% if ns.in_list %}
+                  </ul>
+                  {% set ns.in_list = false %}
+                {% endif %}
+                {% set formatted_p = raw_line | replace('**', '<PBOLD>') | replace('<PBOLD>', '<strong>', 1) %}
+                {% set formatted_p = formatted_p | replace('<PBOLD>', '</strong>') | replace('*', '') %}
+                <p class="doc-p">{{ formatted_p | safe }}</p>
+              {% endif %}
+
+            {% else %}
+              {% if ns.in_list %}
+                </ul>
+                {% set ns.in_list = false %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {% if ns.in_list %}</ul>{% endif %}
+        </div><!-- /doc-body -->
+
+      </div><!-- /doc-paper -->
+
+      <!-- Export CTA below doc -->
+      <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-top:28px; flex-wrap:wrap;">
+        <a href="/export-page" class="btn btn-primary btn-lg" id="export-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Proceed to Export
+        </a>
+        <a href="/analyse-view" class="btn btn-secondary">
+          ← Back to Analysis
+        </a>
+      </div>
+
+    </div><!-- /report-main -->
+
+    <!-- ── Sidebar ── -->
+    <div class="report-sidebar">
+
+      <div class="sidebar-panel">
+        <div class="sidebar-panel-head">Report Summary</div>
+        <div class="sidebar-panel-body">
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-label">Period</span>
+            <span class="sidebar-stat-value">{{ report.period_formatted }}</span>
+          </div>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-label">Records</span>
+            <span class="sidebar-stat-value">{{ report.total_records }}</span>
+          </div>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-label">Generated</span>
+            <span class="sidebar-stat-value" style="font-size:0.7rem;">{{ report.generated_at or 'Just now' }}</span>
+          </div>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-label">Mode</span>
+            <span class="sidebar-stat-value">{% if report.is_demo %}Demo{% else %}Live AI{% endif %}</span>
+          </div>
+          <div class="sidebar-stat">
+            <span class="sidebar-stat-label">Model</span>
+            <span class="sidebar-stat-value" style="font-size:0.7rem; max-width: 120px; overflow:hidden; text-overflow:ellipsis;">{{ report.model_used if report.model_used else '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Data Confidence Panel ── -->
+      {% if report.confidence %}
+      {% set conf = report.confidence %}
+      <div class="sidebar-panel">
+        <div class="sidebar-panel-head" style="display:flex; align-items:center; justify-content:space-between;">
+          <span>Data Confidence</span>
+          <span class="conf-badge conf-{{ conf.grade }}">{{ conf.grade_label }}</span>
+        </div>
+        <div class="sidebar-panel-body" style="padding-top:10px;">
+          <!-- Score ring -->
+          <div class="conf-score-row">
+            <div class="conf-score-ring conf-ring-{{ conf.grade }}">
+              <span class="conf-score-num">{{ conf.score }}</span>
+              <span class="conf-score-denom">/100</span>
+            </div>
+            <div class="conf-score-note">
+              Score is computed from record volume, time coverage, completeness, and resolution tracking. It is not an AI output.
+            </div>
+          </div>
+          <!-- Factor list -->
+          <ul class="conf-factors">
+            {% for f in conf.factors %}
+            <li class="conf-factor conf-factor-{{ f.status }}">
+              <span class="conf-factor-dot"></span>
+              <div>
+                <div class="conf-factor-label">{{ f.label }}</div>
+                <div class="conf-factor-detail">{{ f.detail }}</div>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="sidebar-panel">
+        <div class="sidebar-panel-head">Quick Export</div>
+        <div class="sidebar-panel-body">
+          <div class="sidebar-actions">
+            <a href="/export/pdf" class="btn btn-primary" style="font-size:0.8rem; padding:9px 14px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Download PDF
+            </a>
+            <a href="/export/txt" class="btn btn-secondary" style="font-size:0.8rem; padding:9px 14px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Download TXT
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-panel">
+        <div class="sidebar-panel-head">Actions</div>
+        <div class="sidebar-panel-body">
+          <div class="sidebar-actions">
+            <form action="/generate" method="POST" style="margin:0;">
+              <button type="submit" class="btn btn-secondary" style="width:100%; font-size:0.8rem; padding:9px 14px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+                Regenerate Draft
+              </button>
+            </form>
+            <a href="/clear" class="btn btn-ghost" style="width:100%; font-size:0.8rem; padding:9px 14px; text-align:center;">
+              ↩ New Analysis
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SDG Alignment Panel ── -->
+      <div class="sidebar-panel sdg-panel">
+        <div class="sidebar-panel-head" style="display:flex; align-items:center; gap:6px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          SDG Alignment
+        </div>
+        <div class="sidebar-panel-body" style="padding:0;">
+
+          <!-- SDG 15 -->
+          <div class="sdg-item">
+            <div class="sdg-badge sdg-15">15</div>
+            <div class="sdg-item-content">
+              <div class="sdg-item-title">Life on Land</div>
+              <div class="sdg-item-desc">
+                This report documents
+                {% if report.stats and report.stats.species %}
+                  <strong>{{ report.stats.total_records }} HWC incidents</strong> across
+                  <strong>{{ report.stats.species | length }} wildlife species</strong>,
+                {% else %}
+                  HWC incident data,
+                {% endif %}
+                directly contributing to Target 15.5 habitat monitoring and Target 15.7 anti-poaching intelligence.
+              </div>
+              <div class="sdg-targets">
+                <span class="sdg-target-tag">Target 15.5</span>
+                <span class="sdg-target-tag">Target 15.7</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sdg-divider"></div>
+
+          <!-- SDG 17 -->
+          <div class="sdg-item">
+            <div class="sdg-badge sdg-17">17</div>
+            <div class="sdg-item-content">
+              <div class="sdg-item-title">Partnerships for the Goals</div>
+              <div class="sdg-item-desc">
+                Standardised, shareable reports enable
+                {% if report.reporting_team or report.intended_recipient %}
+                  structured data exchange between
+                  <strong>{{ report.reporting_team or 'field teams' }}</strong> and
+                  <strong>{{ report.intended_recipient or 'conservation partners' }}</strong>,
+                {% else %}
+                  structured data exchange between community monitors and conservation partners,
+                {% endif %}
+                supporting Target 17.18 reliable data and Target 17.16 multi-stakeholder coordination.
+              </div>
+              <div class="sdg-targets">
+                <span class="sdg-target-tag">Target 17.16</span>
+                <span class="sdg-target-tag">Target 17.18</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /sdg-panel -->
+
+    </div><!-- /sidebar -->
+
+  </div><!-- /report-layout -->
+</div>
+{% endblock %}

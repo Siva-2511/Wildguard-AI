@@ -1,0 +1,31 @@
+date,time,zone,species,incident_type,damage_description,resolved
+2026-03-01,19:30,Zone Alpha,Elephant,Crop Raid,Herd of 5 damaged 1.2 acres of sugarcane,No
+2026-03-01,22:15,Zone Beta,Leopard,Livestock Predation,2 calves killed near village enclosure,Yes
+2026-03-02,06:45,Zone Gamma,Wild Boar,Crop Raid,Cassava root field destroyed near forest edge,Yes
+2026-03-02,20:10,Zone Alpha,Elephant,Crop Raid,Fence broken and maize crops trampled,No
+2026-03-03,14:20,Zone Delta,Crocodile,Human Injury,Fisherman attacked at river embankment,Yes
+2026-03-03,21:00,Zone Alpha,Elephant,Crop Raid,Repeated crop raid in northern sugarcane plot,No
+2026-03-04,18:50,Zone Beta,Tiger,Livestock Predation,1 cow dragged into buffer zone,No
+2026-03-04,23:40,Zone Gamma,Wild Boar,Crop Raid,Vegetable patch trampled near settlement,Yes
+2026-03-05,19:15,Zone Alpha,Elephant,Property Damage,Water tank and pipe system breached,No
+2026-03-05,08:30,Zone Delta,Sloth Bear,Property Damage,Storage shed broken into for honey/grain,Yes
+2026-03-06,20:45,Zone Alpha,Elephant,Crop Raid,Sugarcane field raided by solitary bull,No
+2026-03-06,22:10,Zone Beta,Leopard,Livestock Predation,3 goats missing from open barn,No
+2026-03-07,07:00,Zone Gamma,Monkey,Crop Raid,Banana plantation stripped near orchard border,Yes
+2026-03-07,19:00,Zone Alpha,Elephant,Crop Raid,Border solar fence breached; maize eaten,No
+2026-03-08,21:30,Zone Beta,Tiger,Livestock Predation,1 bullock killed near forest boundary,Yes
+2026-03-08,18:20,Zone Delta,Sloth Bear,Human Injury,Villager clawed while gathering firewood,Yes
+2026-03-09,20:15,Zone Alpha,Elephant,Crop Raid,Large herd entered paddy fields,No
+2026-03-09,23:05,Zone Gamma,Wild Boar,Crop Raid,Potato tubers excavated overnight,Yes
+2026-03-10,19:40,Zone Alpha,Elephant,Crop Raid,Sugarcane crop raided along river basin,No
+2026-03-10,06:10,Zone Beta,Leopard,Livestock Predation,Poultry house broken into; 15 chickens lost,Yes
+2026-03-11,20:50,Zone Alpha,Elephant,Property Damage,Granary wall collapsed by matriarch elephant,No
+2026-03-11,15:30,Zone Delta,Crocodile,Livestock Predation,Goat taken at river crossing,Yes
+2026-03-12,18:45,Zone Gamma,Wild Boar,Crop Raid,Maize seedling plot flattened,No
+2026-03-12,22:20,Zone Beta,Tiger,Livestock Predation,Cattle enclosure fence breached,No
+2026-03-13,19:10,Zone Alpha,Elephant,Crop Raid,Paddy field boundary trampled,No
+2026-03-13,07:55,Zone Gamma,Monkey,Property Damage,Roof tiles damaged on community hall,Yes
+2026-03-14,21:00,Zone Alpha,Elephant,Crop Raid,Sugarcane plot entry near North Patrol Post,No
+2026-03-14,23:15,Zone Beta,Leopard,Livestock Predation,1 sheep killed near homestead,Yes
+2026-03-15,19:35,Zone Alpha,Elephant,Crop Raid,Paddy and sugarcane damaged across 2 acres,No
+2026-03-15,16:40,Zone Delta,Crocodile,Human Injury,Child bitten near shallow bathing site,Yes

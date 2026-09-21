@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="WildGuard Report AI — AI-powered human-wildlife conflict incident analysis and report generation tool for conservation field officers.">
+  <title>{% block title %}WildGuard Report AI{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script>
+    // Expose server config to JS (no secrets — model name only)
+    window.WG_CONFIG = {
+      model: "{{ config.get('OPENROUTER_MODEL', '') }}"
+    };
+  </script>
+</head>
+<body>
+
+  <!-- Top progress bar (shows during navigation) -->
+  <div class="progress-bar" id="progress-bar"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <!-- Brand -->
+      <a href="/" class="brand" aria-label="WildGuard Home">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">WildGuard</div>
+          <div class="brand-tagline">Report AI · HWC Analysis</div>
+        </div>
+      </a>
+
+      <!-- Step indicator -->
+      <nav class="stepper" aria-label="Progress steps">
+        <a href="/"
+           class="step {% if active_screen == 1 %}step--active{% elif active_screen > 1 %}step--done{% endif %}"
+           aria-current="{% if active_screen == 1 %}step{% endif %}">
+          <span class="step-num">{% if active_screen > 1 %}✓{% else %}1{% endif %}</span>
+          <span class="step-label">Upload</span>
+        </a>
+        <span class="step-arrow">›</span>
+        <a href="/analyse-view"
+           class="step {% if active_screen == 2 %}step--active{% elif active_screen > 2 %}step--done{% elif not has_stats %}step--disabled{% endif %}"
+           aria-current="{% if active_screen == 2 %}step{% endif %}">
+          <span class="step-num">{% if active_screen > 2 %}✓{% else %}2{% endif %}</span>
+          <span class="step-label">Analysis</span>
+        </a>
+        <span class="step-arrow">›</span>
+        <a href="/report"
+           class="step {% if active_screen == 3 %}step--active{% elif active_screen > 3 %}step--done{% elif not has_report %}step--disabled{% endif %}"
+           aria-current="{% if active_screen == 3 %}step{% endif %}">
+          <span class="step-num">{% if active_screen > 3 %}✓{% else %}3{% endif %}</span>
+          <span class="step-label">Report</span>
+        </a>
+        <span class="step-arrow">›</span>
+        <a href="/export-page"
+           class="step {% if active_screen == 4 %}step--active{% elif not has_report %}step--disabled{% endif %}"
+           aria-current="{% if active_screen == 4 %}step{% endif %}">
+          <span class="step-num">4</span>
+          <span class="step-label">Export & Share</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Site Footer ── -->
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="site-footer-brand">
+        <div class="site-footer-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="site-footer-name">WildGuard Report AI</div>
+          <div class="site-footer-tagline">AI-Powered HWC Reporting · 1M1B × IBM SkillsBuild × AICTE 2026</div>
+        </div>
+      </div>
+      <div class="site-footer-sdgs">
+        <span class="footer-sdg-badge footer-sdg-15">SDG 15 · Life on Land</span>
+        <span class="footer-sdg-badge footer-sdg-17">SDG 17 · Partnerships</span>
+      </div>
+      <div class="site-footer-copy">
+        Data processed in-session only · Never stored externally<br>
+        AI drafts require human review before field use
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       WILDGUARD ASSISTANT — Floating Draggable Chatbot
+       ═══════════════════════════════════════════════════════ -->
+
+  <!-- FAB trigger button -->
+  <button class="chat-fab" id="chat-fab" aria-label="Open WildGuard Assistant" title="WildGuard Assistant">
+    <svg class="chat-fab-icon chat-fab-icon--open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <svg class="chat-fab-icon chat-fab-icon--close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+    <span class="chat-fab-badge" id="chat-badge" style="display:none;"></span>
+  </button>
+
+  <!-- Chat window (draggable) -->
+  <div class="chat-window" id="chat-window" role="dialog" aria-label="WildGuard Assistant" aria-hidden="true">
+
+    <!-- Drag handle / header -->
+    <div class="chat-header" id="chat-drag-handle">
+      <div class="chat-header-left">
+        <div class="chat-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="chat-header-title">WildGuard Assistant</div>
+          <div class="chat-header-sub" id="chat-status-line">Powered by AI · OpenRouter</div>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button class="chat-icon-btn" id="chat-clear-btn" title="Clear conversation" aria-label="Clear conversation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+        </button>
+        <button class="chat-icon-btn" id="chat-close-btn" title="Close" aria-label="Close assistant">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Conversation">
+      <!-- welcome message injected by JS -->
+    </div>
+
+    <!-- Input area -->
+    <div class="chat-input-area">
+      <textarea
+        class="chat-input"
+        id="chat-input"
+        placeholder="Ask about HWC reporting, analysis, SDGs…"
+        rows="1"
+        maxlength="600"
+        aria-label="Message input"
+      ></textarea>
+      <button class="chat-send-btn" id="chat-send-btn" aria-label="Send message" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="chat-footer-note">AI-generated responses — verify before using in field decisions</div>
+
+  </div><!-- /chat-window -->
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

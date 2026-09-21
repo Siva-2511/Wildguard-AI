@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}Upload Incident Data — WildGuard Report AI{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <!-- ── Page Header ── -->
+  <div class="page-header" style="margin-bottom: 32px;">
+    <h1 class="page-title">Upload Incident Records</h1>
+    <p class="page-subtitle">Analyse structured human-wildlife conflict data and generate a review-ready monthly report in seconds.</p>
+  </div>
+
+  <!-- ── Alerts ── -->
+  {% if errors %}
+  <div class="alert alert-error" role="alert">
+    <span class="alert-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </span>
+    <div class="alert-content">
+      <strong>Upload Failed</strong>
+      <ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if warnings %}
+  <div class="alert alert-warning" role="alert">
+    <span class="alert-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </span>
+    <div class="alert-content">
+      <strong>Validation Warnings</strong>
+      <ul>{% for w in warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Validation Success ── -->
+  {% if valid and summary %}
+  <div class="validation-result" id="validation-ok">
+    <div class="validation-result-header">
+      <div class="validation-check-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div>
+        <div class="validation-result-title">Records Validated Successfully</div>
+        <div class="validation-result-sub">All required columns detected — ready to analyse</div>
+      </div>
+    </div>
+    <div class="validation-stats">
+      <div class="validation-stat">
+        <div class="validation-stat-value">{{ summary.total_records }}</div>
+        <div class="validation-stat-label">Valid Records</div>
+      </div>
+      <div class="validation-stat">
+        <div class="validation-stat-value">{{ summary.period_start }}</div>
+        <div class="validation-stat-label">Start Date</div>
+      </div>
+      <div class="validation-stat">
+        <div class="validation-stat-value">{{ summary.period_end }}</div>
+        <div class="validation-stat-label">End Date</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── How It Works strip ── -->
+  <div class="how-it-works">
+    <div class="how-step">
+      <div class="how-step-num">1</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Upload CSV</div>
+        <div class="how-step-desc">Drop your incident records file — columns validated instantly.</div>
+      </div>
+    </div>
+    <div class="how-step-arrow">›</div>
+    <div class="how-step">
+      <div class="how-step-num">2</div>
+      <div class="how-step-body">
+        <div class="how-step-title">AI Analyses</div>
+        <div class="how-step-desc">Python calculates species, zone, time &amp; resolution patterns.</div>
+      </div>
+    </div>
+    <div class="how-step-arrow">›</div>
+    <div class="how-step">
+      <div class="how-step-num">3</div>
+      <div class="how-step-body">
+        <div class="how-step-title">Export Report</div>
+        <div class="how-step-desc">AI drafts an 8-section report — download as PDF or plain text.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main Upload Area ── -->
+  <div class="upload-hero" style="margin-top: 24px;">
+
+    <!-- Left: Drop Zone + Actions -->
+    <div class="upload-left">
+      <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" id="file-input" name="file" accept=".csv" style="display:none;" aria-label="Upload CSV file">
+
+        <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Click or drop a CSV file here to upload">
+          <div class="drop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="drop-title">Drop your CSV file here</div>
+          <div class="drop-hint">Supports drag &amp; drop or click to browse</div>
+          <div class="drop-divider">or</div>
+          <button type="button" class="btn-browse" id="browse-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Browse Files
+          </button>
+        </div>
+      </form>
+
+      <!-- Actions row -->
+      <div class="upload-actions">
+        <button type="button" class="btn btn-secondary" id="demo-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Use Demo Data
+        </button>
+
+        {% if valid %}
+        <form action="/analyse" method="POST" style="margin:0; flex: 1;">
+          <button type="submit" class="btn btn-primary btn-lg" style="width:100%;" id="analyse-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Analyse Records
+          </button>
+        </form>
+        {% else %}
+        <button type="button" class="btn btn-primary btn-lg" style="flex:1;" disabled>
+          Analyse Records
+        </button>
+        {% endif %}
+      </div>
+
+      <p style="margin-top: 14px; font-size: 0.75rem; color: var(--text-faint); line-height: 1.5;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Data is processed in-session only and never stored in a database or shared externally.
+      </p>
+    </div>
+
+    <!-- Right: Column Guide -->
+    <div class="upload-right">
+      <div class="info-panel">
+        <div class="info-panel-header">
+          <h3>Required CSV Format</h3>
+          <p>7 columns, case-insensitive headers</p>
+        </div>
+        <div class="info-panel-body">
+          <div class="column-list">
+            <div class="column-item">
+              <span class="column-item-name">date</span>
+              <div class="column-item-desc">Incident date — <code style="font-size:0.75rem;">YYYY-MM-DD</code> or <code style="font-size:0.75rem;">DD/MM/YYYY</code></div>
+              <span class="required-badge">req</span>
+            </div>
+            <div class="column-item">
+              <span class="column-item-name">time</span>
+              <div class="column-item-desc">Time of incident, e.g. <code style="font-size:0.75rem;">14:30</code> (optional for some records)</div>
+            </div>
+            <div class="column-item">
+              <span class="column-item-name">zone</span>
+              <div class="column-item-desc">Geographic patrol zone or area name</div>
+              <span class="required-badge">req</span>
+            </div>
+            <div class="column-item">
+              <span class="column-item-name">species</span>
+              <div class="column-item-desc">Wildlife species involved in incident</div>
+              <span class="required-badge">req</span>
+            </div>
+            <div class="column-item">
+              <span class="column-item-name">incident_type</span>
+              <div class="column-item-desc">Category of conflict, e.g. crop raid, livestock attack</div>
+              <span class="required-badge">req</span>
+            </div>
+            <div class="column-item">
+              <span class="column-item-name">damage_description</span>
+              <div class="column-item-desc">Free-text description of damage or observations</div>
+            </div>
+            <div class="column-item">
+              <span class="column-item-name">resolved</span>
+              <div class="column-item-desc">Resolution status — <code style="font-size:0.75rem;">Yes</code> or <code style="font-size:0.75rem;">No</code></div>
+              <span class="required-badge">req</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /upload-hero -->
+</div>
+{% endblock %}

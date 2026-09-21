@@ -1,0 +1,93 @@
+date,time,zone,species,incident_type,damage_description,resolved
+2025-10-01,19:45,Zone D,Elephant,Crop Raid,Maize field on northern boundary entered,No
+2025-10-01,06:20,Zone A,Lion,Livestock Predation,1 goat taken near boma,Yes
+2025-10-02,20:10,Zone D,Elephant,Crop Raid,Sorghum plot damaged approx 0.3 acres,No
+2025-10-02,18:55,Zone D,Elephant,Crop Raid,Maize field near Zone D waterpoint,No
+2025-10-03,07:15,Zone A,Buffalo,Crop Raid,Cassava fence broken,Yes
+2025-10-03,21:30,Zone C,Leopard,Livestock Predation,1 sheep missing from enclosure,No
+2025-10-04,19:00,Zone D,Elephant,Crop Raid,Maize stalks broken near river edge,No
+2025-10-04,14:30,Zone B,Buffalo,Crop Raid,Field boundary damaged,Yes
+2025-10-05,20:45,Zone D,Elephant,Crop Raid,Sweet potato plot entered,No
+2025-10-05,08:00,Zone A,Lion,Livestock Predation,2 cattle chased near waterhole,No
+2025-10-06,18:30,Zone D,Elephant,Crop Raid,Northern boundary crop field,Yes
+2025-10-06,22:00,Zone B,Buffalo,Property Damage,Fence posts broken along perimeter,No
+2025-10-07,19:15,Zone D,Elephant,Crop Raid,Maize and sorghum field,No
+2025-10-07,06:45,Zone A,Lion,Livestock Predation,3 goats injured,Yes
+2025-10-08,20:00,Zone D,Elephant,Crop Raid,Crop field near Zone D community area,No
+2025-10-08,15:00,Zone B,Buffalo,Crop Raid,Groundnut field damaged,Yes
+2025-10-09,19:30,Zone D,Elephant,Crop Raid,Maize field eastern plot,No
+2025-10-09,23:15,Zone C,Leopard,Livestock Predation,1 goat taken,Yes
+2025-10-10,18:50,Zone D,Elephant,Crop Raid,Northern access road crop strip,No
+2025-10-10,07:00,Zone A,Buffalo,Crop Raid,Maize fence broken,Yes
+2025-10-11,20:30,Zone D,Elephant,Crop Raid,Crop field southern edge Zone D,No
+2025-10-11,21:45,Zone B,Buffalo,Property Damage,Water trough damaged,No
+2025-10-12,19:00,Zone D,Elephant,Crop Raid,Field near seasonal stream,Yes
+2025-10-12,06:30,Zone A,Lion,Livestock Predation,1 calf attacked,Yes
+2025-10-13,20:15,Zone D,Elephant,Crop Raid,Main crop plot Zone D,No
+2025-10-13,14:00,Zone B,Buffalo,Crop Raid,Cassava plot boundary,Yes
+2025-10-14,19:45,Zone D,Elephant,Crop Raid,Maize damaged 0.5 acres estimate,No
+2025-10-14,08:30,Zone A,Buffalo,Crop Raid,Fence line broken near northern plot,Yes
+2025-10-15,21:00,Zone D,Elephant,Crop Raid,Maize field night entry,No
+2025-10-15,18:00,Zone C,Buffalo,Crop Raid,Sorghum plot perimeter,Yes
+2025-10-16,20:00,Zone D,Elephant,Crop Raid,Central Zone D crop area,No
+2025-10-16,07:45,Zone A,Lion,Livestock Predation,2 sheep killed,No
+2025-10-17,19:20,Zone D,Elephant,Crop Raid,Near community boundary marker,No
+2025-10-17,22:30,Zone B,Leopard,Livestock Predation,1 goat missing,No
+2025-10-18,18:45,Zone D,Elephant,Crop Raid,Maize field near Zone D patrol post,Yes
+2025-10-18,06:00,Zone A,Buffalo,Crop Raid,Groundnut plot along fence line,Yes
+2025-10-19,20:30,Zone D,Elephant,Crop Raid,Seasonal crop area Zone D east,No
+2025-10-19,15:30,Zone B,Buffalo,Crop Raid,Cassava and maize mixed plot,Yes
+2025-10-20,19:00,Zone D,Elephant,Crop Raid,Main field northern end,No
+2025-10-20,21:00,Zone C,Elephant,Crop Raid,Field on Zone C boundary,Yes
+2025-10-21,20:15,Zone D,Elephant,Crop Raid,Maize field secondary plot,No
+2025-10-21,07:30,Zone A,Lion,Livestock Predation,1 donkey injured,Yes
+2025-10-22,19:45,Zone D,Elephant,Crop Raid,Field near waterhole Zone D,No
+2025-10-22,14:15,Zone B,Buffalo,Property Damage,Gate broken at field entrance,Yes
+2025-10-23,18:30,Zone D,Elephant,Crop Raid,Crop strip along eastern road,No
+2025-10-23,22:45,Zone C,Leopard,Livestock Predation,1 sheep taken,No
+2025-10-24,20:00,Zone D,Elephant,Crop Raid,Maize and sorghum Zone D central,No
+2025-10-24,06:15,Zone A,Buffalo,Crop Raid,Field boundary entered,Yes
+2025-10-25,19:15,Zone D,Elephant,Crop Raid,Northern plot entry,No
+2025-10-25,08:45,Zone A,Lion,Livestock Predation,2 cattle chased,Yes
+2025-10-26,20:45,Zone D,Elephant,Crop Raid,Main maize field Zone D,No
+2025-10-26,15:00,Zone B,Buffalo,Crop Raid,Cassava plot,Yes
+2025-10-27,19:00,Zone D,Elephant,Crop Raid,Crop plot near patrol track,Yes
+2025-10-27,21:30,Zone C,Buffalo,Crop Raid,Sorghum field edge,No
+2025-10-28,18:45,Zone D,Elephant,Crop Raid,Maize field near water source,No
+2025-10-28,07:00,Zone A,Lion,Livestock Predation,1 goat killed,Yes
+2025-10-29,20:10,Zone D,Elephant,Crop Raid,Field central Zone D,No
+2025-10-29,22:00,Zone B,Buffalo,Property Damage,Perimeter fence damage,No
+2025-10-30,19:30,Zone D,Elephant,Crop Raid,Maize field late entry,No
+2025-10-30,06:30,Zone A,Buffalo,Crop Raid,Northern boundary field,Yes
+2025-10-31,20:00,Zone D,Elephant,Crop Raid,Final October entry Zone D north,No
+2025-10-31,14:45,Zone B,Buffalo,Crop Raid,Cassava plot southern end,Yes
+2025-10-01,13:00,Zone B,Buffalo,Crop Raid,Groundnut field midday entry,Yes
+2025-10-03,17:30,Zone A,Elephant,Crop Raid,Field near Zone A boundary,Yes
+2025-10-05,09:00,Zone C,Buffalo,Crop Raid,Sorghum early morning,Yes
+2025-10-07,18:00,Zone B,Lion,Livestock Predation,Cattle near waterhole zone B,No
+2025-10-09,11:30,Zone A,Buffalo,Crop Raid,Late morning cassava entry,Yes
+2025-10-11,16:00,Zone C,Elephant,Crop Raid,Afternoon crop entry Zone C,Yes
+2025-10-13,09:45,Zone B,Buffalo,Crop Raid,Morning field entry,Yes
+2025-10-15,17:45,Zone A,Elephant,Crop Raid,Evening field boundary,No
+2025-10-17,10:00,Zone C,Buffalo,Crop Raid,Morning sorghum plot,Yes
+2025-10-19,13:30,Zone B,Buffalo,Crop Raid,Afternoon entry cassava,Yes
+2025-10-21,16:30,Zone A,Buffalo,Crop Raid,Late afternoon field,Yes
+2025-10-23,09:00,Zone C,Lion,Livestock Predation,Morning near boma,Yes
+2025-10-25,11:00,Zone B,Elephant,Crop Raid,Mid-morning crop entry,Yes
+2025-10-27,16:00,Zone A,Buffalo,Crop Raid,Afternoon maize boundary,Yes
+2025-10-29,10:30,Zone C,Buffalo,Crop Raid,Morning sorghum field,Yes
+2025-10-02,17:00,Zone C,Elephant,Crop Raid,Early evening crop,No
+2025-10-04,20:00,Zone A,Buffalo,Crop Raid,Evening field entry,Yes
+2025-10-06,19:30,Zone B,Elephant,Crop Raid,Evening maize plot,Yes
+2025-10-08,21:00,Zone C,Buffalo,Livestock Predation,Night livestock sighting,No
+2025-10-10,18:00,Zone A,Elephant,Crop Raid,Evening field boundary,No
+2025-10-12,20:00,Zone B,Buffalo,Crop Raid,Night crop entry,Yes
+2025-10-14,17:30,Zone C,Elephant,Crop Raid,Evening Zone C border,Yes
+2025-10-16,19:00,Zone A,Buffalo,Crop Raid,Evening field,Yes
+2025-10-18,21:30,Zone B,Elephant,Crop Raid,Night maize field,No
+2025-10-20,18:15,Zone C,Buffalo,Crop Raid,Evening sorghum,Yes
+2025-10-22,20:30,Zone A,Elephant,Crop Raid,Night crop entry,No
+2025-10-24,17:00,Zone B,Buffalo,Crop Raid,Evening cassava,Yes
+2025-10-26,19:45,Zone C,Elephant,Crop Raid,Evening Zone C crop,No
+2025-10-28,21:15,Zone A,Buffalo,Crop Raid,Night field boundary,Yes
+2025-10-30,18:30,Zone B,Lion,Livestock Predation,Evening cattle near fence,No
