@@ -28,6 +28,11 @@ import uuid
 # In-memory storage for session data (avoids 4KB cookie size limit)
 STORE = {}
 
+def get_sid():
+    if 'sid' not in session:
+        session['sid'] = str(uuid.uuid4())
+    return session['sid']
+
 # Storage helper (prefers Flask session serialized, falls back to STORE)
 def get_user_store():
     sid = get_sid()
