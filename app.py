@@ -28,14 +28,34 @@ import uuid
 # In-memory storage for session data (avoids 4KB cookie size limit)
 STORE = {}
 
-def get_sid():
-    if 'sid' not in session:
-        session['sid'] = str(uuid.uuid4())
-    return session['sid']
+# Storage helper (prefers Flask session serialized, falls back to STORE)
+def get_user_store():
+    sid = get_sid()
+    store = STORE.get(sid)
+    if not store:
+        # Attempt to recover from Flask session cookie
+        raw = session.get('user_store')
+        if raw:
+            try:
+                store = json.loads(raw)
+                STORE[sid] = store
+            except Exception:
+                store = {}
+        else:
+            store = {}
+    return sid, store
+
+def save_user_store(sid, store):
+    STORE[sid] = store
+    try:
+        # Keep a JSON-encoded backup in Flask session cookie for serverless persistence
+        session['user_store'] = json.dumps(store)
+    except Exception as e:
+        print(f"Session save warning: {e}")
 
 def _nav_flags(sid):
-    """Return breadcrumb enable flags based on what exists in STORE for this session."""
-    store = STORE.get(sid, {})
+    """Return breadcrumb enable flags based on what exists in user store for this session."""
+    _, store = get_user_store()
     return {
         'has_stats': bool(store.get('stats')),
         'has_report': bool(store.get('report')),
@@ -43,12 +63,12 @@ def _nav_flags(sid):
 
 @app.route('/')
 def index():
-    sid = get_sid()
+    sid, _ = get_user_store()
     return render_template('screen1_upload.html', active_screen=1, **_nav_flags(sid))
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    sid = get_sid()
+    sid, _ = get_user_store()
     if 'file' not in request.files:
         return render_template('screen1_upload.html', active_screen=1,
                                errors=["No file selected. Please upload a CSV file."], **_nav_flags(sid))
@@ -60,11 +80,12 @@ def upload():
         return render_template('screen1_upload.html', active_screen=1,
                                errors=result['errors'], warnings=result['warnings'], **_nav_flags(sid))
 
-    STORE[sid] = {
+    store = {
         'validated_data': result['data'],
         'summary': result['summary'],
         'warnings': result['warnings']
     }
+    save_user_store(sid, store)
 
     return render_template(
         'screen1_upload.html',
@@ -75,9 +96,13 @@ def upload():
         **_nav_flags(sid)
     )
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_file(os.path.join(app.root_path, 'static', 'favicon.ico'), mimetype='image/vnd.microsoft.icon')
+
 @app.route('/use-demo', methods=['POST'])
 def use_demo():
-    sid = get_sid()
+    sid, _ = get_user_store()
     if not os.path.exists(DEMO_CSV_PATH):
         return render_template('screen1_upload.html', active_screen=1,
                                errors=["Demo CSV file not found on server."], **_nav_flags(sid))
@@ -99,11 +124,12 @@ def use_demo():
         return render_template('screen1_upload.html', active_screen=1,
                                errors=result['errors'], **_nav_flags(sid))
 
-    STORE[sid] = {
+    store = {
         'validated_data': result['data'],
         'summary': result['summary'],
         'warnings': result['warnings']
     }
+    save_user_store(sid, store)
 
     return render_template(
         'screen1_upload.html',
@@ -116,20 +142,19 @@ def use_demo():
 
 @app.route('/analyse', methods=['POST'])
 def analyse():
-    sid = get_sid()
-    user_store = STORE.get(sid, {})
+    sid, user_store = get_user_store()
     records = user_store.get('validated_data')
     if not records:
         return redirect(url_for('index'))
 
     stats = run_analysis(records)
     user_store['stats'] = stats
+    save_user_store(sid, user_store)
     return render_template('screen2_analysis.html', active_screen=2, stats=stats, **_nav_flags(sid))
 
 @app.route('/analyse-view', methods=['GET'])
 def analyse_view():
-    sid = get_sid()
-    user_store = STORE.get(sid, {})
+    sid, user_store = get_user_store()
     stats = user_store.get('stats')
     if not stats:
         return redirect(url_for('index'))
@@ -137,8 +162,7 @@ def analyse_view():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    sid = get_sid()
-    user_store = STORE.get(sid, {})
+    sid, user_store = get_user_store()
     stats = user_store.get('stats')
     summary_info = user_store.get('summary', {})
 
@@ -154,13 +178,13 @@ def generate():
     # Assemble full report — pass summary_info for confidence scoring
     report_dict = assemble_report(stats, llm_result, summary_info)
     user_store['report'] = report_dict
+    save_user_store(sid, user_store)
 
     return redirect(url_for('report_view'))
 
 @app.route('/report', methods=['GET', 'POST'])
 def report_view():
-    sid = get_sid()
-    user_store = STORE.get(sid, {})
+    sid, user_store = get_user_store()
     report_dict = user_store.get('report')
     if not report_dict:
         return redirect(url_for('index'))
@@ -172,6 +196,7 @@ def report_view():
         report_dict['intended_recipient'] = request.form.get('intended_recipient', '').strip()
         report_dict['prepared_by'] = request.form.get('prepared_by', '').strip()
         user_store['report'] = report_dict
+        save_user_store(sid, user_store)
 
         if request.form.get('action') == 'save_context':
             return render_template('screen3_report.html', active_screen=3, report=report_dict, context_saved=True, **_nav_flags(sid))
@@ -180,8 +205,7 @@ def report_view():
 
 @app.route('/export-page', methods=['GET'])
 def export_page():
-    sid = get_sid()
-    user_store = STORE.get(sid, {})
+    sid, user_store = get_user_store()
     report_dict = user_store.get('report')
     if not report_dict:
         return redirect(url_for('index'))
@@ -189,8 +213,7 @@ def export_page():
 
 @app.route('/export/pdf', methods=['GET'])
 def export_pdf_route():
-    sid = get_sid()
-    user_store = STORE.get(sid, {})
+    sid, user_store = get_user_store()
     report_dict = user_store.get('report')
     if not report_dict:
         return redirect(url_for('index'))
@@ -206,8 +229,7 @@ def export_pdf_route():
 
 @app.route('/export/txt', methods=['GET'])
 def export_txt_route():
-    sid = get_sid()
-    user_store = STORE.get(sid, {})
+    sid, user_store = get_user_store()
     report_dict = user_store.get('report')
     if not report_dict:
         return redirect(url_for('index'))
